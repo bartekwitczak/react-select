@@ -17,6 +17,9 @@ const Creatable = createClass({
 		// See Select.propTypes.filterOptions
 		filterOptions: PropTypes.any,
 
+		// Decides if new option is on top or bottom of options
+		isNewOptionOnBottom: PropTypes.bool,
+
 		// Searches for any matching option within the set of options.
 		// This function prevents duplicate options from being created.
 		// ({ option: Object, options: Array, labelKey: string, valueKey: string }): boolean
@@ -65,6 +68,7 @@ const Creatable = createClass({
 	getDefaultProps () {
 		return {
 			filterOptions: defaultFilterOptions,
+			isNewOptionOnBottom: false,
 			isOptionUnique,
 			isValidNewOption,
 			menuRenderer: defaultMenuRenderer,
@@ -101,7 +105,7 @@ const Creatable = createClass({
 	},
 
 	filterOptions (...params) {
-		const { filterOptions, isValidNewOption, options, promptTextCreator } = this.props;
+		const { filterOptions, isNewOptionOnBottom, isValidNewOption, options, promptTextCreator } = this.props;
 
 		// TRICKY Check currently selected options as well.
 		// Don't display a create-prompt for a value that's selected.
@@ -135,7 +139,9 @@ const Creatable = createClass({
 					valueKey: this.valueKey
 				});
 
-				filteredOptions.unshift(this._createPlaceholderOption);
+				isNewOptionOnBottom
+					? filteredOptions.shift(this._createPlaceholderOption)
+					: filteredOptions.unshift(this._createPlaceholderOption);
 			}
 		}
 
