@@ -140,7 +140,7 @@ const Creatable = createClass({
 				});
 
 				isNewOptionOnBottom
-					? filteredOptions.shift(this._createPlaceholderOption)
+					? filteredOptions.push(this._createPlaceholderOption)
 					: filteredOptions.unshift(this._createPlaceholderOption);
 			}
 		}

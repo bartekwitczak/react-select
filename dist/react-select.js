@@ -14,8 +14,6 @@ var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_ag
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== 'function' && superClass !== null) { throw new TypeError('Super expression must either be null or a function, not ' + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
@@ -99,16 +97,13 @@ var Async = (function (_Component) {
 			}
 		}
 	}, {
-		key: 'componentWillUpdate',
-		value: function componentWillUpdate(nextProps, nextState) {
-			var _this = this;
-
-			var propertiesToSync = ['options'];
-			propertiesToSync.forEach(function (prop) {
-				if (_this.props[prop] !== nextProps[prop]) {
-					_this.setState(_defineProperty({}, prop, nextProps[prop]));
-				}
-			});
+		key: 'componentWillReceiveProps',
+		value: function componentWillReceiveProps(nextProps) {
+			if (nextProps.options !== this.props.options) {
+				this.setState({
+					options: nextProps.options
+				});
+			}
 		}
 	}, {
 		key: 'clearOptions',
@@ -118,7 +113,7 @@ var Async = (function (_Component) {
 	}, {
 		key: 'loadOptions',
 		value: function loadOptions(inputValue) {
-			var _this2 = this;
+			var _this = this;
 
 			var loadOptions = this.props.loadOptions;
 
@@ -133,8 +128,8 @@ var Async = (function (_Component) {
 			}
 
 			var callback = function callback(error, data) {
-				if (callback === _this2._callback) {
-					_this2._callback = null;
+				if (callback === _this._callback) {
+					_this._callback = null;
 
 					var options = data && data.options || [];
 
@@ -142,7 +137,7 @@ var Async = (function (_Component) {
 						cache[inputValue] = options;
 					}
 
-					_this2.setState({
+					_this.setState({
 						isLoading: false,
 						options: options
 					});
@@ -226,7 +221,7 @@ var Async = (function (_Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this3 = this;
+			var _this2 = this;
 
 			var _props3 = this.props;
 			var children = _props3.children;
@@ -241,13 +236,13 @@ var Async = (function (_Component) {
 				placeholder: isLoading ? loadingPlaceholder : placeholder,
 				options: isLoading && loadingPlaceholder ? [] : options,
 				ref: function ref(_ref) {
-					return _this3.select = _ref;
+					return _this2.select = _ref;
 				},
 				onChange: function onChange(newValues) {
-					if (_this3.props.multi && _this3.props.value && newValues.length > _this3.props.value.length) {
-						_this3.clearOptions();
+					if (_this2.props.multi && _this2.props.value && newValues.length > _this2.props.value.length) {
+						_this2.clearOptions();
 					}
-					_this3.props.onChange(newValues);
+					_this2.props.onChange(newValues);
 				}
 			};
 
@@ -387,6 +382,9 @@ var Creatable = (0, _createReactClass2['default'])({
 		// See Select.propTypes.filterOptions
 		filterOptions: _propTypes2['default'].any,
 
+		// Decides if new option is on top or bottom of options
+		isNewOptionOnBottom: _propTypes2['default'].bool,
+
 		// Searches for any matching option within the set of options.
 		// This function prevents duplicate options from being created.
 		// ({ option: Object, options: Array, labelKey: string, valueKey: string }): boolean
@@ -435,6 +433,7 @@ var Creatable = (0, _createReactClass2['default'])({
 	getDefaultProps: function getDefaultProps() {
 		return {
 			filterOptions: _utilsDefaultFilterOptions2['default'],
+			isNewOptionOnBottom: false,
 			isOptionUnique: isOptionUnique,
 			isValidNewOption: isValidNewOption,
 			menuRenderer: _utilsDefaultMenuRenderer2['default'],
@@ -473,6 +472,7 @@ var Creatable = (0, _createReactClass2['default'])({
 	filterOptions: function filterOptions() {
 		var _props2 = this.props;
 		var filterOptions = _props2.filterOptions;
+		var isNewOptionOnBottom = _props2.isNewOptionOnBottom;
 		var isValidNewOption = _props2.isValidNewOption;
 		var options = _props2.options;
 		var promptTextCreator = _props2.promptTextCreator;
@@ -509,7 +509,7 @@ var Creatable = (0, _createReactClass2['default'])({
 					valueKey: this.valueKey
 				});
 
-				filteredOptions.unshift(this._createPlaceholderOption);
+				isNewOptionOnBottom ? filteredOptions.push(this._createPlaceholderOption) : filteredOptions.unshift(this._createPlaceholderOption);
 			}
 		}
 
